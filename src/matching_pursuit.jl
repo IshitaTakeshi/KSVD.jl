@@ -5,7 +5,7 @@ using DataStructures
 # https://en.wikipedia.org/wiki/Matching_pursuit#The_algorithm
 
 default_max_iter = 20
-default_tolerance = 1e-16
+default_tolerance = 1e-6
 
 
 function sparsevec(d::DefaultDict, m::Int)
