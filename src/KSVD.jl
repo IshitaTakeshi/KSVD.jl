@@ -10,7 +10,7 @@ module KSVD
 # If you try to read the code, I recommend you to see Figure 2 first.
 #
 
-export ksvd
+export ksvd, matching_pursuit
 
 include("matching_pursuit.jl")
 
@@ -78,8 +78,7 @@ end
 # TODO add tolerance of D as an argument
 function ksvd(Y::Matrix, n_atoms::Int; max_iter::Int = default_max_iter)
     """
-    K-SVD derives the most efficient dictionary D and the coefficients X
-    for given Y so that DX = Y
+    K-SVD derives the most efficient dictionary D
     """
 
     K = n_atoms
@@ -100,7 +99,7 @@ function ksvd(Y::Matrix, n_atoms::Int; max_iter::Int = default_max_iter)
         X = matching_pursuit(Y, D, max_iter = 200)
         D, X = ksvd(Y, D, X)
     end
-    return D, X  # returns D and X such that D*X approximates Y
+    return D, X
 end
 
 end # module
