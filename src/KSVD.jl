@@ -12,9 +12,13 @@ module KSVD
 
 export ksvd, matching_pursuit
 
+using ProgressMeter
+
+
 include("matching_pursuit.jl")
 
 default_max_iter = 200
+default_max_iter_mp = 200
 
 srand(1234)  # for stability of tests
 
@@ -75,10 +79,12 @@ function ksvd(Y::AbstractArray, D::AbstractArray, X::AbstractArray)
 end
 
 
-# TODO add tolerance of D as an argument
-function ksvd(Y::Matrix, n_atoms::Int; max_iter::Int = default_max_iter)
+function ksvd(Y::Matrix, n_atoms::Int;
+              tolerance = nothing,
+              max_iter::Int = default_max_iter,
+              max_iter_mp::Int = default_max_iter_mp)
     """
-    K-SVD derives the most efficient dictionary D
+    K-SVD designs the most efficient dictionary D.
     """
 
     K = n_atoms
@@ -87,17 +93,30 @@ function ksvd(Y::Matrix, n_atoms::Int; max_iter::Int = default_max_iter)
     if K < n
         throw(ArgumentError("size(Y, 1) must be >= K"))
     end
+
     if max_iter <= 0
         throw(ArgumentError("`max_iter` must be > 0"))
     end
 
+    if tolerance == nothing
+        tolerance = ceil(K*n/2)
+        tolerance = Int(tolerance)
+    end
+#    if tolerance <= 0  # TODO tolerance cannnot be < n
+#        throw(ArgumentError("`tolerance` must be > 0"))
+#    end
+
     # D is a dictionary matrix that contains atoms for columns.
     D = init_dictionary(n, K)  # size(D) == (n, K)
 
-    X = spzeros(K, N)  # just for making X global in this function
-    for i in 1:max_iter
-        X = matching_pursuit(Y, D, max_iter = 200)
+    X = spzeros(K, N) # just for making X global in this function
+    @showprogress for i in 1:max_iter
+        X = matching_pursuit(Y, D, max_iter = max_iter_mp)
         D, X = ksvd(Y, D, X)
+
+        if sum(X .!= 0) <= tolerance
+            return D, X
+        end
     end
     return D, X
 end

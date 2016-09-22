@@ -1,5 +1,5 @@
 # basic one
-Y = Float64[
+Y = [
      0  3;
      1  0;
      1 -3;
@@ -8,7 +8,6 @@ Y = Float64[
 ]
 D, X = ksvd(Y, 20)
 @test norm(Y-D*X) < 1e-6
-
 
 # max_iter must be > 0
 @test_throws ArgumentError ksvd(Y, 2, max_iter = 0)
@@ -23,6 +22,5 @@ Y = [
     -1 1 2;
      1 0 1
 ]
-D, X = ksvd(Y, 2)
-@test norm(Y-D*X) < 1e-4  # relax the constraint since the dictionary is small
-
+D, X = ksvd(Y, 2, max_iter_mp = 800)
+@test norm(Y-D*X) < 0.001  # relax the constraint since the dictionary is small
