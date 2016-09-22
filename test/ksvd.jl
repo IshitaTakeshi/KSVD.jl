@@ -1,4 +1,4 @@
-# The basic one
+# basic one
 Y = Float64[
      0  3;
      1  0;
@@ -14,8 +14,8 @@ D, X = ksvd(Y, 20)
 @test_throws ArgumentError ksvd(Y, 2, max_iter = 0)
 @test_throws ArgumentError ksvd(Y, 2, max_iter = -1)
 
-# n_atoms must be larger than the signal dimensions (size(Y, 1))
-# since K-SVD is the algorithm for designing overcomplete dictionaries
+# n_atoms must be larger than the signal dimensions (same as the dimensions of
+# atoms) since K-SVD is an algorithm for designing overcomplete dictionaries
 @test_throws ArgumentError ksvd(rand(4, 3), 2)
 
 # But should work well when size(Y, 1) == n_atoms
