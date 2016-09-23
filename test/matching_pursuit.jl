@@ -45,36 +45,3 @@ Y = [
 ]
 
 @test_throws ArgumentError matching_pursuit(Y, D)
-
-
-# when dimensions of data and atoms do not match
-D = [
-	-2  -4  -4   6   0;
-	-1  -2  -2   3   0;
-	 8   0   5   4  -6
-]
-
-Y = [
-    -1  2;
-     0  3;
-     5 -5
-]
-
-@test_throws ArgumentError matching_pursuit(Y, D)
-
-
-# when a dictionary is not a full-rank matrix
-# in this case D[1, :] == 2 * D[2, :]
-D = [
-	-2  -4  -4   6   0;
-	-1  -2  -2   3   0;
-	 8   0   5   4  -6
-]
-
-Y = [
-    -1  2;
-     0  3;
-     5 -5
-]
-
-@test_throws ArgumentError matching_pursuit(Y, D)

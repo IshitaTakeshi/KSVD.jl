@@ -6,6 +6,7 @@ Y = [
     -2  3;
      0  0;
 ]
+
 D, X = ksvd(Y, 20)
 @test norm(Y-D*X) < 1e-6
 

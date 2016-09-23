@@ -23,7 +23,7 @@ default_max_iter_mp = 200
 srand(1234)  # for stability of tests
 
 
-function error_matrix(Y, D, X, k)
+function error_matrix(Y::Matrix, D::Matrix, X::Matrix, k::Int)
     Eₖ = Y
     for j in 1:size(D, 2)
         if j != k
@@ -49,7 +49,7 @@ function init_dictionary(n::Int, K::Int)
 end
 
 
-function ksvd(Y::AbstractArray, D::AbstractArray, X::AbstractArray)
+function ksvd(Y::Matrix, D::Matrix, X::Matrix)
     N = size(Y, 2)
     for k in 1:size(X, 1)
         xₖ = X[k, :]
@@ -80,7 +80,7 @@ end
 
 
 function ksvd(Y::Matrix, n_atoms::Int;
-              tolerance = nothing,
+              tolerance = nothing,  # TODO change the name
               max_iter::Int = default_max_iter,
               max_iter_mp::Int = default_max_iter_mp)
     """
@@ -112,7 +112,7 @@ function ksvd(Y::Matrix, n_atoms::Int;
     X = spzeros(K, N) # just for making X global in this function
     @showprogress for i in 1:max_iter
         X = matching_pursuit(Y, D, max_iter = max_iter_mp)
-        D, X = ksvd(Y, D, X)
+        D, X = ksvd(Y, D, full(X))
 
         if sum(X .!= 0) <= tolerance
             return D, X

@@ -62,13 +62,6 @@ function matching_pursuit(data::Vector, dictionary::Matrix;
         ))
     end
 
-    if rank(dictionary) != size(data, 1)
-        throw(ArgumentError(
-            "The rank of the dictionary is too small. " *
-            "`rank(dictionary)` must be equal to `size(data, 1)`."
-        ))
-    end
-
     matching_pursuit_(data, dictionary, max_iter, tolerance)
 end
 
