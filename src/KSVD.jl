@@ -53,13 +53,12 @@ function ksvd(Y::Matrix, D::Matrix, X::Matrix)
     N = size(Y, 2)
     for k in 1:size(X, 1)
         xₖ = X[k, :]
-
         # ignore if the k-th row is zeros
         if all(xₖ .== 0)
             continue
         end
 
-        # wₖ is the indices where xₖ is non-zero,
+        # wₖ is the column indices where the k-th row of xₖ is non-zero,
         # which is equivalent to [i for i in N if xₖ[i] != 0]
         _, wₖ, _ = findnz(xₖ)
 
@@ -67,11 +66,11 @@ function ksvd(Y::Matrix, D::Matrix, X::Matrix)
         # correspond to examples that use the atom D[:, k]
         Eₖ = error_matrix(Y, D, X, k)
         Ωₖ = sparse(wₖ, 1:length(wₖ), ones(length(wₖ)), N, length(wₖ))
-        # Note that S is a vector that contains diagonal elements of Δ
-        # such that Eₖ * Ωₖ == U * Δ * V .
+        # Note that S is a vector that contains diagonal elements of
+        # a matrix Δ such that Eₖ * Ωₖ == U * Δ * V.
         # Non-zero entries of X are set to
         # the first column of V multiplied by Δ(1, 1)
-        U, S, V = svd(Eₖ * Ωₖ)
+        U, S, V = svd(Eₖ * Ωₖ, thin=false)  # TODO try thin = false
         D[:, k] = U[:, 1]
         X[k, wₖ] = V[:, 1] * S[1]
     end
@@ -102,18 +101,20 @@ function ksvd(Y::Matrix, n_atoms::Int;
         tolerance = ceil(K*n/2)
         tolerance = Int(tolerance)
     end
-#    if tolerance <= 0  # TODO tolerance cannnot be < n
-#        throw(ArgumentError("`tolerance` must be > 0"))
-#    end
+
+    if tolerance <= 0
+        throw(ArgumentError("`tolerance` must be > 0"))
+    end
 
     # D is a dictionary matrix that contains atoms for columns.
     D = init_dictionary(n, K)  # size(D) == (n, K)
 
-    X = spzeros(K, N) # just for making X global in this function
+    X = spzeros(K, N)
     @showprogress for i in 1:max_iter
-        X = matching_pursuit(Y, D, max_iter = max_iter_mp)
-        D, X = ksvd(Y, D, full(X))
+        X_sparse = matching_pursuit(Y, D, max_iter = max_iter_mp)
+        D, X = ksvd(Y, D, full(X_sparse))
 
+        # return if the number of non-zero entries are <= tolerance
         if sum(X .!= 0) <= tolerance
             return D, X
         end
