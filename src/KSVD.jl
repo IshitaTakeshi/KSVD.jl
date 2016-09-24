@@ -25,6 +25,7 @@ srand(1234)  # for stability of tests
 
 
 function error_matrix(Y::Matrix, D::Matrix, X::Matrix, k::Int)
+    # indices = [i for i in 1:size(D, 2) if i != k]
     indices = deleteat!(collect(1:size(D, 2)), k)
     return Y - D[:, indices] * X[indices, :]
 end
