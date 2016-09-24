@@ -17,7 +17,7 @@ using ProgressMeter
 
 include("matching_pursuit.jl")
 
-default_tolerance_zeros = 0.5
+default_tolerance_zeros = 0.9
 default_max_iter = 200
 default_max_iter_mp = 200
 
@@ -25,13 +25,8 @@ srand(1234)  # for stability of tests
 
 
 function error_matrix(Y::Matrix, D::Matrix, X::Matrix, k::Int)
-    Eₖ = Y
-    for j in 1:size(D, 2)
-        if j != k
-            Eₖ -= D[:, j] * X[j, :]
-        end
-    end
-    return Eₖ
+    indices = deleteat!(collect(1:size(D, 2)), k)
+    return Y - D[:, indices] * X[indices, :]
 end
 
 
