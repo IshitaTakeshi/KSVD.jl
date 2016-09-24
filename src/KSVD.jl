@@ -17,6 +17,7 @@ using ProgressMeter
 
 include("matching_pursuit.jl")
 
+default_tolerance_zeros = 0.5
 default_max_iter = 200
 default_max_iter_mp = 200
 
@@ -79,7 +80,7 @@ end
 
 
 function ksvd(Y::Matrix, n_atoms::Int;
-              tolerance_nonzero = nothing,
+              tolerance_zeros::Float64 = default_tolerance_zeros,
               max_iter::Int = default_max_iter,
               max_iter_mp::Int = default_max_iter_mp)
     """
@@ -88,16 +89,17 @@ function ksvd(Y::Matrix, n_atoms::Int;
 
     K = n_atoms
     n, N = size(Y)
-    X = spzeros(K, N)  # just for making X global in this function
 
     if K < n
-        throw(ArgumentError("size(Y, 1) must be >= K"))
+        throw(ArgumentError("size(Y, 1) must be >= `n_atoms`"))
     end
 
-    if tolerance_nonzero == nothing
-        tolerance_nonzero = ceil(0.5*length(X))
-        tolerance_nonzero = Int(tolerance_nonzero)
+    if !(0 <= tolerance_zeros <= 1)
+        throw(ArgumentError("`tolerance_zeros` must be in range [0,1]"))
     end
+
+    X = spzeros(K, N)  # just for making X global in this function
+    max_zeros = Int(ceil(tolerance_zeros * length(X)))
 
     # D is a dictionary matrix that contains atoms for columns.
     D = init_dictionary(n, K)  # size(D) == (n, K)
@@ -108,8 +110,8 @@ function ksvd(Y::Matrix, n_atoms::Int;
         X_sparse = matching_pursuit(Y, D, max_iter = max_iter_mp)
         D, X = ksvd(Y, D, full(X_sparse))
 
-        # return if the number of non-zero entries are <= tolerance_nonzero
-        if sum(X .!= 0) <= tolerance_nonzero
+        # return if the number of zero entries are <= max_zeros
+        if sum(X .== 0) > max_zeros
             return D, X
         end
         next!(p)
