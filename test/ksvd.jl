@@ -7,7 +7,7 @@ Y = [
      0  0;
 ]
 
-D, X = ksvd(Y, 20, tolerance_zeros = 0.0)
+D, X = ksvd(Y, 20, tolerance_zeros = 1.0)
 @test norm(Y-D*X) < 1e-6
 
 # tolerance_zeros must be > 0
