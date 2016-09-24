@@ -70,7 +70,7 @@ function ksvd(Y::Matrix, D::Matrix, X::Matrix)
         # a matrix Δ such that Eₖ * Ωₖ == U * Δ * V.
         # Non-zero entries of X are set to
         # the first column of V multiplied by Δ(1, 1)
-        U, S, V = svd(Eₖ * Ωₖ, thin=false)  # TODO try thin = false
+        U, S, V = svd(Eₖ * Ωₖ, thin=false)
         D[:, k] = U[:, 1]
         X[k, wₖ] = V[:, 1] * S[1]
     end
@@ -79,45 +79,40 @@ end
 
 
 function ksvd(Y::Matrix, n_atoms::Int;
-              tolerance = nothing,  # TODO change the name
+              tolerance_nonzero = nothing,
               max_iter::Int = default_max_iter,
               max_iter_mp::Int = default_max_iter_mp)
     """
-    K-SVD designs the most efficient dictionary D.
+    K-SVD design an efficient dictionary D.
     """
 
     K = n_atoms
     n, N = size(Y)
+    X = spzeros(K, N)  # just for making X global in this function
 
     if K < n
         throw(ArgumentError("size(Y, 1) must be >= K"))
     end
 
-    if max_iter <= 0
-        throw(ArgumentError("`max_iter` must be > 0"))
-    end
-
-    if tolerance == nothing
-        tolerance = ceil(K*n/2)
-        tolerance = Int(tolerance)
-    end
-
-    if tolerance <= 0
-        throw(ArgumentError("`tolerance` must be > 0"))
+    if tolerance_nonzero == nothing
+        tolerance_nonzero = ceil(0.5*length(X))
+        tolerance_nonzero = Int(tolerance_nonzero)
     end
 
     # D is a dictionary matrix that contains atoms for columns.
     D = init_dictionary(n, K)  # size(D) == (n, K)
 
-    X = spzeros(K, N)
-    @showprogress for i in 1:max_iter
+    p = Progress(max_iter)
+
+    for i in 1:max_iter
         X_sparse = matching_pursuit(Y, D, max_iter = max_iter_mp)
         D, X = ksvd(Y, D, full(X_sparse))
 
-        # return if the number of non-zero entries are <= tolerance
-        if sum(X .!= 0) <= tolerance
+        # return if the number of non-zero entries are <= tolerance_nonzero
+        if sum(X .!= 0) <= tolerance_nonzero
             return D, X
         end
+        next!(p)
     end
     return D, X
 end
