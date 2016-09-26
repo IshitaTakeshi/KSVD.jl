@@ -100,7 +100,7 @@ function ksvd(Y::Matrix, n_atoms::Int;
     end
 
     X = spzeros(K, N)  # just for making X global in this function
-    max_zeros = Int(ceil(tolerance_zeros * length(X)))
+    max_n_zeros = Int(ceil(tolerance_zeros * length(X)))
 
     # D is a dictionary matrix that contains atoms for columns.
     D = init_dictionary(n, K)  # size(D) == (n, K)
@@ -111,8 +111,8 @@ function ksvd(Y::Matrix, n_atoms::Int;
         X_sparse = matching_pursuit(Y, D, max_iter = max_iter_mp)
         D, X = ksvd(Y, D, full(X_sparse))
 
-        # return if the number of zero entries are <= max_zeros
-        if sum(X .== 0) > max_zeros
+        # return if the number of zero entries are <= max_n_zeros
+        if sum(X .== 0) > max_n_zeros
             return D, X
         end
         next!(p)
