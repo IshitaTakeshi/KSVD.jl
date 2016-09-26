@@ -3,8 +3,7 @@ Demonstration using the digits dataset
 
 ![result](digits256.png)
 
-You can obtain a dictionary that can represent digits sparsely by running `julia digits.jl`.
-The resulting dictionary will be saved as `digits256.dlm`.
+You can obtain a dictionary that can represent digits and will be saved as `digits256.dlm` by running `julia digits.jl`.
 Please make sure the dependencies are satisfied before running.
 
 # Dependencies
