@@ -17,7 +17,7 @@ using ProgressMeter
 
 include("matching_pursuit.jl")
 
-default_tolerance_zeros = 0.9
+default_sparsity_allowance = 0.9
 default_max_iter = 200
 default_max_iter_mp = 200
 
@@ -77,14 +77,24 @@ end
 
 """
     ksvd(Y::Matrix, n_atoms::Int;
-         tolerance_zeros::Float64 = $default_tolerance_zeros,
+         sparsity_allowance::Float64 = $default_sparsity_allowance,
          max_iter::Int = $default_max_iter,
          max_iter_mp::Int = $default_max_iter_mp)
 
-Run K-SVD that designs an efficient dictionary for sparse representations.
+Run K-SVD that designs an efficient dictionary D for sparse representations,
+and returns X such that DX = Y or DX ≈ Y.
+
+```
+# Arguments
+* `sparsity_allowance`: Stop iteration if the number of zeros in X / the number
+    of elements in X > sparsity_allowance.
+* `max_iter`: Limit of iterations.
+* `max_iter_mp`: Limit of iterations in Matching Pursuit that `ksvd` calls at
+    every iteration.
+```
 """
 function ksvd(Y::Matrix, n_atoms::Int;
-              tolerance_zeros::Float64 = default_tolerance_zeros,
+              sparsity_allowance::Float64 = default_sparsity_allowance,
               max_iter::Int = default_max_iter,
               max_iter_mp::Int = default_max_iter_mp)
 
@@ -95,12 +105,12 @@ function ksvd(Y::Matrix, n_atoms::Int;
         throw(ArgumentError("size(Y, 1) must be >= `n_atoms`"))
     end
 
-    if !(0 <= tolerance_zeros <= 1)
-        throw(ArgumentError("`tolerance_zeros` must be in range [0,1]"))
+    if !(0 <= sparsity_allowance <= 1)
+        throw(ArgumentError("`sparsity_allowance` must be in range [0,1]"))
     end
 
     X = spzeros(K, N)  # just for making X global in this function
-    max_n_zeros = Int(ceil(tolerance_zeros * length(X)))
+    max_n_zeros = Int(ceil(sparsity_allowance * length(X)))
 
     # D is a dictionary matrix that contains atoms for columns.
     D = init_dictionary(n, K)  # size(D) == (n, K)

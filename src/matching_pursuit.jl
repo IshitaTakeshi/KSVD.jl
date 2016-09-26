@@ -47,6 +47,11 @@ end
                      tolerance::Float64 = $default_tolerance)
 
 Find ``x`` such that ``Dx = y`` or ``Dx ≈ y`` where y is `data` and D is `dictionary`.
+```
+# Arguments
+* `max_iter`: Hard limit of iterations
+* `tolerance`: Exit when the norm of the residual < tolerance
+```
 """
 function matching_pursuit(data::Vector, dictionary::Matrix;
                           max_iter::Int = default_max_iter,
@@ -76,6 +81,11 @@ end
                      tolerance::Float64 = $default_tolerance)
 
 Find ``X`` such that ``DX = Y`` or ``DX ≈ Y`` where Y is `data` and D is `dictionary`.
+```
+# Arguments
+* `max_iter`: Hard limit of iterations
+* `tolerance`: Exit when the norm of the residual < tolerance
+```
 """
 function matching_pursuit(data::Matrix, dictionary::Matrix;
                           max_iter::Int = default_max_iter,
