@@ -9,8 +9,8 @@ Please make sure the dependencies are satisfied before running.
 
 # Dependencies
 Python 3 packages are required:
-* ![matplotlib](http://matplotlib.org)
-* ![scikit-learn](http://scikit-learn.org)
-* ![numpy](http://numpy.org/)
+* [matplotlib](http://matplotlib.org)
+* [scikit-learn](http://scikit-learn.org)
+* [numpy](http://numpy.org/)
 
 This example also requires PyPlot.jl but it should already be installed by package dependencies.

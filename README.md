@@ -14,7 +14,7 @@ This package implements:
 ![digits256](examples/digits256.png)
 ![images](examples/digit_images.png)
 
-See [README](examples/README.md) for more details.
+See [README in examples](examples/README.md) for more details.
 
 ## Provided functions
 
