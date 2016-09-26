@@ -75,13 +75,18 @@ function ksvd(Y::Matrix, D::Matrix, X::Matrix)
 end
 
 
+"""
+    ksvd(Y::Matrix, n_atoms::Int;
+         tolerance_zeros::Float64 = $default_tolerance_zeros,
+         max_iter::Int = $default_max_iter,
+         max_iter_mp::Int = $default_max_iter_mp)
+
+Run K-SVD that designs an efficient dictionary for sparse representations.
+"""
 function ksvd(Y::Matrix, n_atoms::Int;
               tolerance_zeros::Float64 = default_tolerance_zeros,
               max_iter::Int = default_max_iter,
               max_iter_mp::Int = default_max_iter_mp)
-    """
-    K-SVD design an efficient dictionary D.
-    """
 
     K = n_atoms
     n, N = size(Y)

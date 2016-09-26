@@ -41,12 +41,16 @@ function matching_pursuit_(data::Vector, dictionary::Matrix,
 end
 
 
+"""
+    matching_pursuit(data::Vector, dictionary::Matrix;
+                     max_iter::Int = $default_max_iter,
+                     tolerance::Float64 = $default_tolerance)
+
+Find ``x`` such that ``Dx = y`` or ``Dx ≈ y`` where y is `data` and D is `dictionary`.
+"""
 function matching_pursuit(data::Vector, dictionary::Matrix;
                           max_iter::Int = default_max_iter,
                           tolerance::Float64 = default_tolerance)
-    """
-    Finds x such that Dx approximates y where y is `data` and D is `dictionary`.
-    """
 
     if tolerance <= 0
         throw(ArgumentError("`tolerance` must be > 0"))
@@ -66,6 +70,13 @@ function matching_pursuit(data::Vector, dictionary::Matrix;
 end
 
 
+"""
+    matching_pursuit(data::Matrix, dictionary::Matrix;
+                     max_iter::Int = $default_max_iter,
+                     tolerance::Float64 = $default_tolerance)
+
+Find ``X`` such that ``DX = Y`` or ``DX ≈ Y`` where Y is `data` and D is `dictionary`.
+"""
 function matching_pursuit(data::Matrix, dictionary::Matrix;
                           max_iter::Int = default_max_iter,
                           tolerance::Float64 = default_tolerance)
