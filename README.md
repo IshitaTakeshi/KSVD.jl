@@ -7,6 +7,12 @@ This package implements:
 * K-SVD as described in the original paper: [K-SVD: An Algorithm for Designing Overcomplete Dictionaries for Sparse Representation](http://www.cs.technion.ac.il/~freddy/papers/120.pdf)
 * [Matching Pursuit](https://en.wikipedia.org/wiki/Matching_pursuit) for representing signals using a given dictionary.
 
+# Installation
+Launch Julia and type
+
+```julia
+Pkg.clone("https://github.com/IshitaTakeshi/KSVD.jl")
+```
 
 ## Example
 [Samples of digits dataset in scikit-learn ](http://scikit-learn.org/stable/auto_examples/datasets/plot_digits_last_image.html) and the obtained dictionary of 256 atoms.
