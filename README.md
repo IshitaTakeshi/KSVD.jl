@@ -14,7 +14,7 @@ Launch Julia and type
 Pkg.clone("https://github.com/IshitaTakeshi/KSVD.jl")
 ```
 
-## Example
+# Example
 Samples of [the digits dataset in scikit-learn ](http://scikit-learn.org/stable/auto_examples/datasets/plot_digits_last_image.html) and the obtained dictionary of 256 atoms.
 
 ![images](examples/digit_images.png)
@@ -22,7 +22,7 @@ Samples of [the digits dataset in scikit-learn ](http://scikit-learn.org/stable/
 
 See [README in examples](examples/README.md) for more details.
 
-## Provided functions
+# Provided functions
 
 Only a few functions are provided: `ksvd` and `matching_pursuit`.
 See [the documentation](docs/build/index.md).
