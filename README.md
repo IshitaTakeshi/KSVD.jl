@@ -11,8 +11,7 @@ This package implements:
 ## Example
 [Samples of digits dataset in scikit-learn ](http://scikit-learn.org/stable/auto_examples/datasets/plot_digits_last_image.html) and the obtained dictionary of 256 atoms.
 
-![images](examples/digit_images.png)
-![digits256](examples/digits256.png)
+![result](examples/result.png)
 
 
 ## Provided functions
