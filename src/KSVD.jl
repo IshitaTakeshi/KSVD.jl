@@ -49,7 +49,7 @@ end
 function ksvd(Y::Matrix, D::Matrix, X::Matrix)
     N = size(Y, 2)
     for k in 1:size(X, 1)
-        xₖ = X[k, :]
+        xₖ = X[[k], :]
         # ignore if the k-th row is zeros
         if all(xₖ .== 0)
             continue
