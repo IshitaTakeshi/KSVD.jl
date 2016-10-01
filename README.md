@@ -20,7 +20,7 @@ Samples of [the digits dataset in scikit-learn ](http://scikit-learn.org/stable/
 ![images](examples/digit_images.png)
 ![digits256](examples/digits256.png)
 
-See [README in examples](examples/README.md) for more details.
+See [examples](examples) for more details.
 
 # Provided functions
 
