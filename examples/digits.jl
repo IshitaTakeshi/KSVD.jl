@@ -2,7 +2,7 @@ using PyCall
 using KSVD
 
 # Use Python3
-ENV["PYTHON"] = strip(readall(`which python3`))
+ENV["PYTHON"] = strip(readstring(`which python3`))
 
 # Load digits dataset from scikt-learn
 @pyimport sklearn.datasets as datasets
