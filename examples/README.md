@@ -3,7 +3,8 @@ Demonstration using the digits dataset
 
 ![result](digits256.png)
 
-You can obtain a dictionary that can represent digits and will be saved as `digits256.dlm` by running `julia digits.jl`.
+You can obtain a dictionary that can represent digits and will be saved as `digits256.dlm` by running `julia digits.jl`.   
+Then you can show the obtained dictionary by running `python3 visualizer.py`.  
 Please make sure the dependencies are satisfied before running.
 
 # Dependencies
