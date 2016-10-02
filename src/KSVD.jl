@@ -13,6 +13,7 @@ module KSVD
 export ksvd, matching_pursuit
 
 using ProgressMeter
+using Base.Threads
 
 
 include("matching_pursuit.jl")
@@ -39,7 +40,7 @@ function init_dictionary(n::Int, K::Int)
         D = rand(n, K)
     end
 
-    for k in 1:K
+    @threads for k in 1:K
         D[:, k] /= norm(D[:, k])
     end
     return D
@@ -48,7 +49,7 @@ end
 
 function ksvd(Y::Matrix, D::Matrix, X::Matrix)
     N = size(Y, 2)
-    for k in 1:size(X, 1)
+    @threads for k in 1:size(X, 1)
         xₖ = X[k, :]
         # ignore if the k-th row is zeros
         if all(xₖ .== 0)
