@@ -8,7 +8,7 @@ Y = [
 ]
 
 D, X = ksvd(Y, 20, sparsity_allowance = 1.0)
-@test norm(Y-D*X) < 1e-6
+@test norm(Y-D*X) < 1e-4
 
 # sparsity_allowance must be > 0
 @test_throws ArgumentError ksvd(Y, 20, sparsity_allowance = -0.1)
@@ -28,7 +28,7 @@ Y = [
     -1 1 2;
      1 0 1
 ]
-D, X = ksvd(Y, 2, max_iter_mp = 800)
+D, X = ksvd(Y, 2, max_iter_mp = 4000)
 @test norm(Y-D*X) < 0.001  # relax the constraint since the dictionary is small
 
 # Return only if X is sparse enough
