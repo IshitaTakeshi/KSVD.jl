@@ -33,10 +33,9 @@ end
 
 
 function init_dictionary(n::Int, K::Int)
-    # D must be a rank-n matrix
-    assert(n <= K)
+    # D must be a full-rank matrix
     D = rand(n, K)
-    while rank(D) != n
+    while rank(D) != min(n, K)
         D = rand(n, K)
     end
 
@@ -101,10 +100,6 @@ function ksvd(Y::Matrix, n_atoms::Int;
 
     K = n_atoms
     n, N = size(Y)
-
-    if K < n
-        throw(ArgumentError("size(Y, 1) must be >= `n_atoms`"))
-    end
 
     if !(0 <= sparsity_allowance <= 1)
         throw(ArgumentError("`sparsity_allowance` must be in range [0,1]"))

@@ -7,7 +7,7 @@ Y = [
      0  0;
 ]
 
-D, X = ksvd(Y, 20, sparsity_allowance = 1.0)
+D, X = ksvd(Y, 8, max_iter_mp = 600, sparsity_allowance = 1.0)
 @test norm(Y-D*X) < 1e-4
 
 # sparsity_allowance must be > 0
@@ -18,10 +18,6 @@ D, X = ksvd(Y, 20, sparsity_allowance = 1.0)
 ksvd(Y, 20, max_iter = 1)
 ksvd(Y, 20, sparsity_allowance = 0.0)
 ksvd(Y, 20, sparsity_allowance = 1.0)
-
-# n_atoms must be larger than the signal dimensions (same as the dimensions of
-# atoms) since K-SVD is an algorithm for designing overcomplete dictionaries
-@test_throws ArgumentError ksvd(rand(4, 3), 2)
 
 # But should work well when size(Y, 1) == n_atoms
 Y = [
