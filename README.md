@@ -1,6 +1,6 @@
 # KSVD.jl
 
-K-SVD is an algorithm for creating overcomplete dictionaries for sparse representations.  
+[K-SVD](https://en.wikipedia.org/wiki/K-SVD) is an algorithm for creating overcomplete dictionaries for sparse representations.  
 
 This package implements:
 
@@ -11,7 +11,28 @@ This package implements:
 Launch Julia and type
 
 ```julia
-Pkg.clone("https://github.com/IshitaTakeshi/KSVD.jl")
+Pkg.add("KSVD")
+```
+
+# Usage
+
+Assume that each column of `Y` represents a feature vector (or an input signal from some system).  
+`ksvd` derives `D` and `X` such that `DX ≈ Y` from only `Y`.  
+
+```
+D, X = ksvd(
+    Y,
+    256,  # the number of atoms in D
+    max_iter = 200,  # max iterations of K-SVD
+    max_iter_mp = 40,  # max iterations of matching pursuit called in K-SVD
+    sparsity_allowance = 0.96  # stop iteration when more than 96% of elements in X become zeros
+)
+```
+
+[Matching Pursuit](https://en.wikipedia.org/wiki/Matching_pursuit) calculates `Y` using as few elements in `D` as possible. In other words, Matching Pursuit derives `X` from `D` and `Y` such that `DX = Y` in constraint that `X` be as sparse as possible.
+
+```julia
+X_sparse = matching_pursuit(Y, D, max_iter = 200)
 ```
 
 # Example
