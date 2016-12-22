@@ -17,6 +17,7 @@ Pkg.add("KSVD")
 # Usage
 
 Assume that each column of Y represents a feature vector (or an input signal from some system).  
+D is a dictionary. Each column of D represents an atom.  
 K-SVD derives D and X such that DX ≈ Y from only Y.  
 
 ```julia
