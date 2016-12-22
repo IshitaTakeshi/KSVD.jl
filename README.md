@@ -16,10 +16,10 @@ Pkg.add("KSVD")
 
 # Usage
 
-Assume that each column of `Y` represents a feature vector (or an input signal from some system).  
-`ksvd` derives `D` and `X` such that `DX ≈ Y` from only `Y`.  
+Assume that each column of Y represents a feature vector (or an input signal from some system).  
+K-SVD derives D and X such that DX ≈ Y from only Y.  
 
-```
+```julia
 D, X = ksvd(
     Y,
     256,  # the number of atoms in D
@@ -29,7 +29,7 @@ D, X = ksvd(
 )
 ```
 
-[Matching Pursuit](https://en.wikipedia.org/wiki/Matching_pursuit) calculates `Y` using as few elements in `D` as possible. In other words, Matching Pursuit derives `X` from `D` and `Y` such that `DX = Y` in constraint that `X` be as sparse as possible.
+[Matching Pursuit](https://en.wikipedia.org/wiki/Matching_pursuit) derives X from D and Y such that DX = Y in constraint that X be as sparse as possible.
 
 ```julia
 X_sparse = matching_pursuit(Y, D, max_iter = 200)
