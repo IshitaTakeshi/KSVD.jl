@@ -13,19 +13,19 @@ module KSVD
 export ksvd, matching_pursuit
 
 using ProgressMeter
-using Base.Threads
+using Base.Threads, Random, SparseArrays, LinearAlgebra
 
 
 include("matching_pursuit.jl")
 
-default_sparsity_allowance = 0.9
-default_max_iter = 200
-default_max_iter_mp = 200
+const default_sparsity_allowance = 0.9
+const default_max_iter = 200
+const default_max_iter_mp = 200
 
-srand(1234)  # for stability of tests
+Random.seed!(1234)  # for stability of tests
 
 
-function error_matrix(Y::Matrix, D::Matrix, X::Matrix, k::Int)
+function error_matrix(Y::AbstractMatrix, D::AbstractMatrix, X::AbstractMatrix, k::Int)
     # indices = [i for i in 1:size(D, 2) if i != k]
     indices = deleteat!(collect(1:size(D, 2)), k)
     return Y - D[:, indices] * X[indices, :]
@@ -39,25 +39,23 @@ function init_dictionary(n::Int, K::Int)
         D = rand(n, K)
     end
 
-    @threads for k in 1:K
-        D[:, k] /= norm(D[:, k])
+    @inbounds for k in 1:K
+        D[:, k] ./= norm(@view(D[:, k]))
     end
     return D
 end
 
 
-function ksvd(Y::Matrix, D::Matrix, X::Matrix)
+function ksvd(Y::AbstractMatrix, D::AbstractMatrix, X::AbstractMatrix)
     N = size(Y, 2)
-    @threads for k in 1:size(X, 1)
-        xₖ = X[[k], :]
+    for k in 1:size(X, 1)
+        xₖ = X[k, :]
         # ignore if the k-th row is zeros
-        if all(xₖ .== 0)
-            continue
-        end
+        all(iszero, xₖ) && continue
 
         # wₖ is the column indices where the k-th row of xₖ is non-zero,
         # which is equivalent to [i for i in N if xₖ[i] != 0]
-        _, wₖ, _ = findnz(xₖ)
+        wₖ = findall(!iszero, xₖ)
 
         # Eₖ * Ωₖ implies a selection of error columns that
         # correspond to examples that use the atom D[:, k]
@@ -67,7 +65,7 @@ function ksvd(Y::Matrix, D::Matrix, X::Matrix)
         # a matrix Δ such that Eₖ * Ωₖ == U * Δ * V.
         # Non-zero entries of X are set to
         # the first column of V multiplied by Δ(1, 1)
-        U, S, V = svd(Eₖ * Ωₖ, thin=false)
+        U, S, V = svd(Eₖ * Ωₖ, full=true)
         D[:, k] = U[:, 1]
         X[k, wₖ] = V[:, 1] * S[1]
     end
@@ -76,7 +74,7 @@ end
 
 
 """
-    ksvd(Y::Matrix, n_atoms::Int;
+    ksvd(Y::AbstractMatrix, n_atoms::Int;
          sparsity_allowance::Float64 = $default_sparsity_allowance,
          max_iter::Int = $default_max_iter,
          max_iter_mp::Int = $default_max_iter_mp)
@@ -93,8 +91,8 @@ and returns X such that DX = Y or DX ≈ Y.
     every iteration.
 ```
 """
-function ksvd(Y::Matrix, n_atoms::Int;
-              sparsity_allowance::Float64 = default_sparsity_allowance,
+function ksvd(Y::AbstractMatrix, n_atoms::Int;
+              sparsity_allowance = default_sparsity_allowance,
               max_iter::Int = default_max_iter,
               max_iter_mp::Int = default_max_iter_mp)
 
@@ -106,7 +104,7 @@ function ksvd(Y::Matrix, n_atoms::Int;
     end
 
     X = spzeros(K, N)  # just for making X global in this function
-    max_n_zeros = Int(ceil(sparsity_allowance * length(X)))
+    max_n_zeros = ceil(Int, sparsity_allowance * length(X))
 
     # D is a dictionary matrix that contains atoms for columns.
     D = init_dictionary(n, K)  # size(D) == (n, K)
@@ -115,10 +113,10 @@ function ksvd(Y::Matrix, n_atoms::Int;
 
     for i in 1:max_iter
         X_sparse = matching_pursuit(Y, D, max_iter = max_iter_mp)
-        D, X = ksvd(Y, D, full(X_sparse))
+        D, X = ksvd(Y, D, Matrix(X_sparse))
 
         # return if the number of zero entries are <= max_n_zeros
-        if sum(X .== 0) > max_n_zeros
+        if sum(iszero, X) > max_n_zeros
             return D, X
         end
         next!(p)

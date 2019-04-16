@@ -36,4 +36,4 @@ Y = [
 # More than 20% of elements in X must be zeros
 sparsity_allowance = 0.2
 D, X = ksvd(Y, 5, max_iter = Int(1e10), sparsity_allowance = sparsity_allowance)
-@test sum(X .== 0) / length(X) > sparsity_allowance
+@test sum(iszero, X) / length(X) > sparsity_allowance

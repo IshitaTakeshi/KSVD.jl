@@ -1,25 +1,24 @@
-import Base: sparsevec
 using DataStructures
 
 # The implementation is referencing the wikipedia page
 # https://en.wikipedia.org/wiki/Matching_pursuit#The_algorithm
 
-default_max_iter = 20
-default_tolerance = 1e-6
+const default_max_iter = 20
+const default_tolerance = 1e-6
 
 
-function sparsevec(d::DefaultDict, m::Int)
-    sparsevec(collect(keys(d)), collect(values(d)), m)
+function SparseArrays.sparsevec(d::DefaultDict, m::Int)
+    SparseArrays.sparsevec(collect(keys(d)), collect(values(d)), m)
 end
 
 
-function matching_pursuit_(data::Vector, dictionary::Matrix,
+function matching_pursuit_(data::AbstractVector, dictionary::AbstractMatrix,
                            max_iter::Int, tolerance::Float64)
     n_atoms = size(dictionary, 2)
 
     residual = copy(data)
 
-    xdict = DefaultDict(Int, Float64, 0)
+    xdict = DefaultDict{Int, Float64}(0.)
     for i in 1:max_iter
         if norm(residual) < tolerance
             return sparsevec(xdict, n_atoms)
@@ -27,12 +26,12 @@ function matching_pursuit_(data::Vector, dictionary::Matrix,
 
         # find an atom with maximum inner product
         products = dictionary' * residual
-        _, maxindex = findmax(abs(products))
+        _, maxindex = findmax(abs.(products))
         maxval = products[maxindex]
         atom = dictionary[:, maxindex]
 
         # c is the length of the projection of data onto atom
-        a = maxval / sum(atom.^2)  # equivalent to maxval / norm(atom)^2
+        a = maxval / sum(abs2, atom)  # equivalent to maxval / norm(atom)^2
         residual -= atom * a
 
         xdict[maxindex] += a
@@ -42,7 +41,7 @@ end
 
 
 """
-    matching_pursuit(data::Vector, dictionary::Matrix;
+    matching_pursuit(data::Vector, dictionary::AbstractMatrix;
                      max_iter::Int = $default_max_iter,
                      tolerance::Float64 = $default_tolerance)
 
@@ -53,9 +52,9 @@ Find ``x`` such that ``Dx = y`` or ``Dx ≈ y`` where y is `data` and D is `dict
 * `tolerance`: Exit when the norm of the residual < tolerance
 ```
 """
-function matching_pursuit(data::Vector, dictionary::Matrix;
+function matching_pursuit(data::AbstractVector, dictionary::AbstractMatrix;
                           max_iter::Int = default_max_iter,
-                          tolerance::Float64 = default_tolerance)
+                          tolerance = default_tolerance)
 
     if tolerance <= 0
         throw(ArgumentError("`tolerance` must be > 0"))
@@ -76,7 +75,7 @@ end
 
 
 """
-    matching_pursuit(data::Matrix, dictionary::Matrix;
+    matching_pursuit(data::AbstractMatrix, dictionary::AbstractMatrix;
                      max_iter::Int = $default_max_iter,
                      tolerance::Float64 = $default_tolerance)
 
@@ -87,7 +86,7 @@ Find ``X`` such that ``DX = Y`` or ``DX ≈ Y`` where Y is `data` and D is `dict
 * `tolerance`: Exit when the norm of the residual < tolerance
 ```
 """
-function matching_pursuit(data::Matrix, dictionary::Matrix;
+function matching_pursuit(data::AbstractMatrix, dictionary::AbstractMatrix;
                           max_iter::Int = default_max_iter,
                           tolerance::Float64 = default_tolerance)
     K = size(dictionary, 2)
