@@ -1,12 +1,16 @@
 # Use Python3
-ENV["PYTHON"] = strip(readstring(`which python3`))
+
+ENV["PYTHON"] = readlines(open(`which python3`))
+
+using LinearAlgebra: norm
+using DelimitedFiles
 
 using PyCall
 using KSVD
 
 
 # Load digits dataset from scikt-learn
-@pyimport sklearn.datasets as datasets
+datasets = pyimport("sklearn.datasets")
 digits = datasets.load_digits()
 
 # Each column of Y is a flattened character image
